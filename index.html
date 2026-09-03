@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Classroom Arena — Think. Move. Win.</title>
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<div id="config-warning" hidden>
+  <strong>Setup needed:</strong> copy <code>config.example.js</code> to <code>config.js</code> and add your
+  Supabase project URL + anon key before online features will work. Local Game still works without this.
+</div>
+
+<div id="toast-host" role="status" aria-live="polite"></div>
+<div id="challenge-inbox"></div>
+
+<main id="app">
+
+  <!-- ============================== HOME / ONBOARDING ============================== -->
+  <section id="screen-onboarding" class="screen screen--hero">
+    <header class="app-header">
+      <span class="app-header__logo">CLASSROOM ARENA</span>
+    </header>
+    <p class="tagline">Think. Move. Win.</p>
+
+    <div class="cta-stack">
+      <button id="btn-play-online" class="btn btn--primary btn--large" type="button">PLAY ONLINE</button>
+      <button id="btn-local-game" class="btn btn--secondary btn--large" type="button">LOCAL GAME</button>
+    </div>
+
+    <div id="home-stats" class="home-stats" hidden></div>
+
+    <button id="btn-how-to-play" class="btn btn--ghost" type="button">How to Play</button>
+  </section>
+
+  <!-- ============================== HOW TO PLAY ============================== -->
+  <section id="screen-how-to-play" class="screen" hidden>
+    <button class="btn btn--ghost" type="button" data-nav-home>&larr; Back</button>
+    <h1>How to Play</h1>
+    <ol class="howto-steps">
+      <li><strong>Place your pieces.</strong> Each player gets only 3 pieces.</li>
+      <li><strong>Move.</strong> After placing all 3, move one of your pieces to an empty square on your turn.</li>
+      <li><strong>Create a line.</strong> Get your 3 pieces in a row — horizontal, vertical, or diagonal.</li>
+      <li><strong>Win.</strong> First player to make 3 in a row wins. Endless back-and-forth ends in a draw.</li>
+    </ol>
+  </section>
+
+  <!-- ============================== AUTH ============================== -->
+  <section id="screen-auth" class="screen" hidden>
+    <button class="btn btn--ghost" type="button" data-nav-home>&larr; Back</button>
+    <h1>Sign in to play online</h1>
+    <div class="tabs">
+      <button id="auth-tab-login" class="tabs__item is-active" type="button">Log In</button>
+      <button id="auth-tab-signup" class="tabs__item" type="button">Sign Up</button>
+    </div>
+
+    <form id="login-form" class="form">
+      <label>Email <input type="email" id="login-email" required autocomplete="email" /></label>
+      <label>Password <input type="password" id="login-password" required autocomplete="current-password" minlength="6" /></label>
+      <button class="btn btn--primary" type="submit">Log In</button>
+    </form>
+
+    <form id="signup-form" class="form" hidden>
+      <label>Username <input type="text" id="signup-username" required minlength="3" maxlength="20" autocomplete="username" /></label>
+      <label>Email <input type="email" id="signup-email" required autocomplete="email" /></label>
+      <label>Password <input type="password" id="signup-password" required autocomplete="new-password" minlength="6" /></label>
+      <button class="btn btn--primary" type="submit">Create Account</button>
+    </form>
+  </section>
+
+  <!-- ============================== CLASSROOM JOIN/CREATE ============================== -->
+  <section id="screen-classroom" class="screen" hidden>
+    <h1>Join Your Classroom</h1>
+    <p class="muted">Enter the classroom code your teacher shared, e.g. <code>CSE-A-2026</code>.</p>
+    <form id="classroom-join-form" class="form">
+      <label>Classroom Code <input type="text" id="classroom-code-input" required placeholder="CSE-A-2026" /></label>
+      <button class="btn btn--primary" type="submit">Enter Arena</button>
+    </form>
+
+    <details class="create-classroom-details">
+      <summary>Create a new classroom instead</summary>
+      <form id="classroom-create-form" class="form">
+        <label>Classroom Name <input type="text" id="classroom-name-input" required placeholder="CSE Section A" /></label>
+        <label>Classroom Code <input type="text" id="classroom-newcode-input" required placeholder="CSE-A-2026" /></label>
+        <button class="btn btn--secondary" type="submit">Create Classroom</button>
+      </form>
+    </details>
+  </section>
+
+  <!-- ============================== CLASSROOM MANAGEMENT ============================== -->
+<section id="screen-classroom-management" class="screen" hidden>
+
+  <button class="btn btn--ghost" type="button" data-screen="dashboard">
+    &larr; Back
+  </button>
+
+  <h1>CLASSROOM MANAGEMENT</h1>
+
+  <p class="muted">
+    Create a classroom, manage your classrooms, and invite classmates.
+  </p>
+
+  <!-- CREATE CLASSROOM -->
+  <div class="management-card">
+
+    <h2>Create New Classroom</h2>
+
+    <form id="management-create-classroom-form" class="form">
+
+      <label>
+        Classroom Name
+        <input
+          type="text"
+          id="management-classroom-name"
+          required
+          maxlength="50"
+          placeholder="CSE Section A"
+        />
+      </label>
+
+      <label>
+        Classroom Code
+        <input
+          type="text"
+          id="management-classroom-code"
+          required
+          maxlength="30"
+          placeholder="CSE-A-2026"
+        />
+      </label>
+
+      <button
+        class="btn btn--primary"
+        type="submit"
+      >
+        CREATE CLASSROOM
+      </button>
+
+    </form>
+
+  </div>
+
+
+  <!-- MY CLASSROOMS -->
+  <div class="management-card">
+
+    <h2>My Classrooms</h2>
+
+    <div id="my-classrooms-list">
+      <p class="muted">Loading classrooms...</p>
+    </div>
+
+  </div>
+
+
+  <!-- JOIN CLASSROOM -->
+  <div class="management-card">
+
+    <h2>Join Classroom</h2>
+
+    <form id="management-join-classroom-form" class="form">
+
+      <label>
+        Classroom Code
+        <input
+          type="text"
+          id="management-join-code"
+          required
+          placeholder="CSE-A-2026"
+        />
+      </label>
+
+      <button
+        class="btn btn--secondary"
+        type="submit"
+      >
+        JOIN CLASSROOM
+      </button>
+
+    </form>
+
+  </div>
+
+</section>
+
+
+  <!-- ============================== DASHBOARD ============================== -->
+  <section id="screen-dashboard" class="screen" hidden>
+    <header class="app-header">
+      <span class="app-header__logo">CLASSROOM ARENA</span>
+      <button id="btn-logout" class="btn btn--ghost btn--small" type="button">Log Out</button>
+    </header>
+    <p id="dashboard-welcome" class="welcome-line"></p>
+    <p id="dashboard-classroom" class="muted"></p>
+
+    <div class="rating-card">
+      <div class="rating-card__rating">
+        <span class="rating-card__number" id="dashboard-rating">—</span>
+        <span id="dashboard-rank-badge"></span>
+      </div>
+      <div class="rating-card__stats">
+        <span>Wins: <b id="dashboard-wins">0</b></span>
+        <span>Losses: <b id="dashboard-losses">0</b></span>
+        <span>Win Rate: <b id="dashboard-winrate">0%</b></span>
+      </div>
+      <div id="dashboard-streak" class="rating-card__streak"></div>
+    </div>
+
+    <div class="cta-stack">
+      <button id="btn-enter-lobby" class="btn btn--primary btn--large" type="button">ENTER LOBBY</button>
+      <button id="btn-classroom-management" class="btn btn--secondary btn--large" type="button">🏫 CLASSROOM</button>
+    </div>
+  </section>
+
+  <!-- ============================== LOBBY ============================== -->
+  <section id="screen-lobby" class="screen" hidden>
+    <button class="btn btn--ghost" type="button" data-nav-home>&larr; Home</button>
+    <h1>CLASSROOM LOBBY</h1>
+    <p id="lobby-count" class="lobby-count"></p>
+
+    <button id="btn-quick-match" class="btn btn--primary btn--large" type="button">QUICK MATCH</button>
+    <div id="quick-match-search" class="quick-match-search" hidden>
+      <div class="spinner" aria-hidden="true"></div>
+      <p id="quick-match-status">Searching for a worthy opponent…</p>
+      <button id="btn-cancel-search" class="btn btn--ghost btn--small" type="button">Cancel</button>
+    </div>
+
+    <div id="lobby-players" class="player-list"></div>
+  </section>
+
+  <!-- ============================== LOCAL GAME ============================== -->
+  <section id="screen-game-local" class="screen" hidden>
+    <button class="btn btn--ghost" type="button" data-nav-home>&larr; Home</button>
+    <h1>3-Piece Tic-Tac-Toe <span class="muted">· Local</span></h1>
+    <p id="local-status" class="turn-indicator"></p>
+    <div id="local-board" class="board"></div>
+    <button id="local-restart" class="btn btn--primary" type="button" hidden>Play Again</button>
+  </section>
+
+  <!-- ============================== ONLINE GAME ============================== -->
+  <section id="screen-game-online" class="screen" hidden>
+    <div class="online-header">
+      <div class="online-header__side">
+        <span class="muted">You are</span>
+        <strong id="online-you-symbol">—</strong>
+      </div>
+      <div id="online-timer" class="online-timer"></div>
+      <div class="online-header__side">
+        <span class="muted" id="online-opponent-name">Opponent</span>
+        <strong id="online-opponent-symbol">—</strong>
+      </div>
+    </div>
+    <p id="online-board-status" class="turn-indicator"></p>
+    <div id="online-board" class="board"></div>
+  </section>
+
+  <!-- ============================== RESULT ============================== -->
+  <section id="screen-result" class="screen" hidden>
+    <h1 id="result-title" class="result-title"></h1>
+    <p id="result-subtitle" class="result-subtitle"></p>
+    <div class="result-rating-block">
+      <span id="result-rating" class="result-rating"></span>
+      <span id="result-rating-delta" class="result-rating-delta"></span>
+    </div>
+    <div class="cta-stack">
+      <button id="result-rematch" class="btn btn--primary" type="button">REMATCH</button>
+      <button id="result-lobby" class="btn btn--secondary" type="button">BACK TO LOBBY</button>
+    </div>
+  </section>
+
+  <!-- ============================== LEADERBOARD ============================== -->
+  <section id="screen-leaderboard" class="screen" hidden>
+    <h1>LEADERBOARD</h1>
+    <div class="tabs">
+      <button id="leaderboard-scope-classroom" class="tabs__item is-active" type="button">Classroom</button>
+      <button id="leaderboard-scope-global" class="tabs__item" type="button">Global</button>
+    </div>
+    <p id="leaderboard-your-rank" class="muted"></p>
+    <div class="leaderboard-head">
+      <span>#</span><span>Player</span><span>Tier</span><span>Rating</span><span>Record</span><span>Win%</span>
+    </div>
+    <div id="leaderboard-list" class="leaderboard-list"></div>
+  </section>
+
+  <!-- ============================== PROFILE ============================== -->
+  <section id="screen-profile" class="screen" hidden>
+    <div class="profile-header">
+      <div class="profile-avatar" aria-hidden="true">🎮</div>
+      <div>
+        <h1 id="profile-username">—</h1>
+        <div id="profile-badge"></div>
+      </div>
+    </div>
+    <div class="rating-card">
+      <div class="rating-card__rating">
+        <span class="rating-card__number" id="profile-rating">—</span>
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div><span id="profile-games">0</span><label>Games Played</label></div>
+      <div><span id="profile-wins">0</span><label>Wins</label></div>
+      <div><span id="profile-losses">0</span><label>Losses</label></div>
+      <div><span id="profile-draws">0</span><label>Draws</label></div>
+      <div><span id="profile-winrate">0%</span><label>Win Rate</label></div>
+      <div><span id="profile-streak">0</span><label>Current Streak</label></div>
+      <div><span id="profile-best-streak">0</span><label>Best Streak</label></div>
+    </div>
+    <h2>Recent Matches</h2>
+    <div id="profile-recent-matches" class="match-list"></div>
+    <button id="btn-view-history" class="btn btn--ghost" type="button">View Full History</button>
+  </section>
+
+  <!-- ============================== MATCH HISTORY ============================== -->
+  <section id="screen-history" class="screen" hidden>
+    <h1>MATCH HISTORY</h1>
+    <select id="history-filter" class="select">
+      <option value="all">All</option>
+      <option value="win">Wins</option>
+      <option value="loss">Losses</option>
+      <option value="draw">Draws</option>
+    </select>
+    <div id="history-list" class="match-list"></div>
+  </section>
+
+</main>
+
+<nav class="bottom-nav">
+  <button class="bottom-nav__item is-active" data-screen="onboarding" type="button">
+    <span class="bottom-nav__icon">🏠</span>Home
+  </button>
+  <button class="bottom-nav__item" data-screen="dashboard" type="button">
+    <span class="bottom-nav__icon">🎮</span>Play
+  </button>
+  <button class="bottom-nav__item" data-screen="leaderboard" type="button">
+    <span class="bottom-nav__icon">🏆</span>Leaderboard
+  </button>
+  <button class="bottom-nav__item" data-screen="profile" type="button">
+    <span class="bottom-nav__icon">👤</span>Profile
+  </button>
+</nav>
+
+<!-- Fill in config.js (copied from config.example.js) with your Supabase project's URL + anon key -->
+<script src="config.js" onerror="console.warn('config.js not found — copy config.example.js to config.js')"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

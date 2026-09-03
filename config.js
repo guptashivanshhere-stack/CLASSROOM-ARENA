@@ -1,0 +1,4 @@
+window.CLASSROOM_ARENA_CONFIG = {
+  SUPABASE_URL: 'https://xdltqrdwxumbqghkmiob.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkbHRxcmR3eHVtYnFnaGttaW9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzOTk5OTksImV4cCI6MjEwMzk3NTk5OX0.SMTP8sdpawtQcdYOG1i2FflEXds-G55ZsDkcMrcKtM4'
+};
