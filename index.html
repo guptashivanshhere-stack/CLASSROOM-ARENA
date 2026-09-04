@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Classroom Arena — Think. Move. Win.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/styles1.css" />
 </head>
 <body>
@@ -20,37 +23,88 @@
 
   <!-- ============================== HOME / ONBOARDING ============================== -->
   <section id="screen-onboarding" class="screen screen--hero">
-    <header class="app-header">
-      <span class="app-header__logo">CLASSROOM ARENA</span>
-    </header>
-    <p class="tagline">Think. Move. Win.</p>
+    <div class="hero-brand">
+      <div class="hero-brand__icon" aria-hidden="true">🏆</div>
+      <header class="app-header">
+        <span class="app-header__logo">CLASSROOM ARENA</span>
+      </header>
+      <p class="tagline">Compete. Think. Conquer.</p>
+    </div>
+
+    <div class="hero-badges" aria-hidden="true">
+      <span class="hero-badge">⚡ 3-Piece Tactics</span>
+      <span class="hero-badge">⚔️ College Esports</span>
+      <span class="hero-badge">🏆 Classroom Elo</span>
+    </div>
 
     <div class="cta-stack">
-      <button id="btn-play-online" class="btn btn--primary btn--large" type="button">PLAY ONLINE</button>
-      <button id="btn-local-game" class="btn btn--secondary btn--large" type="button">LOCAL GAME</button>
+      <button id="btn-play-online" class="btn btn--primary btn--large" type="button">
+        <span class="btn__icon">⚔️</span> PLAY ONLINE
+      </button>
+      <button id="btn-local-game" class="btn btn--secondary btn--large" type="button">
+        <span class="btn__icon">🎮</span> LOCAL GAME
+      </button>
     </div>
 
     <div id="home-stats" class="home-stats" hidden></div>
 
-    <button id="btn-how-to-play" class="btn btn--ghost" type="button">How to Play</button>
+    <button id="btn-how-to-play" class="btn btn--ghost" type="button">
+      <span>📖 How to Play</span>
+    </button>
   </section>
 
   <!-- ============================== HOW TO PLAY ============================== -->
   <section id="screen-how-to-play" class="screen" hidden>
     <button class="btn btn--ghost" type="button" data-nav-home>&larr; Back</button>
     <h1>How to Play</h1>
+    <p class="muted">A collegiate tactical 3-piece game. Fast, strategic, and decisive.</p>
     <ol class="howto-steps">
-      <li><strong>Place your pieces.</strong> Each player gets only 3 pieces.</li>
-      <li><strong>Move.</strong> After placing all 3, move one of your pieces to an empty square on your turn.</li>
-      <li><strong>Create a line.</strong> Get your 3 pieces in a row — horizontal, vertical, or diagonal.</li>
-      <li><strong>Win.</strong> First player to make 3 in a row wins. Endless back-and-forth ends in a draw.</li>
+      <li class="howto-step">
+        <div class="howto-step__badge">1</div>
+        <div class="howto-step__body">
+          <strong>Place your pieces</strong>
+          <p>Players take turns placing one piece at a time on any open square.</p>
+        </div>
+      </li>
+      <li class="howto-step">
+        <div class="howto-step__badge">2</div>
+        <div class="howto-step__body">
+          <strong>Maximum 3 pieces</strong>
+          <p>Each player gets only 3 pieces total on the board.</p>
+        </div>
+      </li>
+      <li class="howto-step">
+        <div class="howto-step__badge">3</div>
+        <div class="howto-step__body">
+          <strong>Move existing pieces after placing 3</strong>
+          <p>Once all 3 of your pieces are placed, pick up one of your pieces and move it to an empty square.</p>
+        </div>
+      </li>
+      <li class="howto-step">
+        <div class="howto-step__badge">4</div>
+        <div class="howto-step__body">
+          <strong>Make 3 in a row</strong>
+          <p>Align your 3 pieces horizontally, vertically, or diagonally while defending against your opponent.</p>
+        </div>
+      </li>
+      <li class="howto-step">
+        <div class="howto-step__badge">5</div>
+        <div class="howto-step__body">
+          <strong>Win the match</strong>
+          <p>The first player to make 3 in a row wins the game and gains Elo rating points!</p>
+        </div>
+      </li>
     </ol>
   </section>
 
   <!-- ============================== AUTH ============================== -->
   <section id="screen-auth" class="screen" hidden>
     <button class="btn btn--ghost" type="button" data-nav-home>&larr; Back</button>
-    <h1>Sign in to play online</h1>
+    <div class="auth-card-header">
+      <span class="auth-card-header__logo">CLASSROOM ARENA</span>
+      <p class="auth-card-header__tagline">Compete. Think. Conquer.</p>
+    </div>
+    <h1>Sign In to Play Online</h1>
     <div class="tabs">
       <button id="auth-tab-login" class="tabs__item is-active" type="button">Log In</button>
       <button id="auth-tab-signup" class="tabs__item" type="button">Sign Up</button>
