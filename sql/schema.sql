@@ -77,6 +77,46 @@ create policy "authenticated users can create a classroom"
   to authenticated
   with check (created_by = auth.uid());
 
+-- Delete a classroom only through the guarded RPC below. This also detaches
+-- historical matches so deleting a classroom does not erase match history.
+create or replace function delete_classroom(p_classroom_id uuid)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  owner_id uuid;
+begin
+  select created_by into owner_id
+  from classrooms
+  where id = p_classroom_id;
+
+  if owner_id is null then
+    raise exception 'Classroom not found.';
+  end if;
+
+  if owner_id <> auth.uid() then
+    raise exception 'Only the classroom creator can delete it.';
+  end if;
+
+  update matches
+  set classroom_id = null
+  where classroom_id = p_classroom_id;
+
+  delete from classrooms
+  where id = p_classroom_id;
+
+  return true;
+end;
+$$;
+
+-- Only logged-in users may call the guarded delete RPC. The function itself
+-- still verifies that auth.uid() is the classroom creator.
+revoke execute on function delete_classroom(uuid) from public;
+grant execute on function delete_classroom(uuid) to authenticated;
+
+
 -- ---------------------------------------------------------------------------
 -- 3. classroom_members
 -- ---------------------------------------------------------------------------

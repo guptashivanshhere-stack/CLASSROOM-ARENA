@@ -222,6 +222,47 @@ async function onCreateClassroomSubmit(e) {
 // ---------------------------------------------------------------------------
 // Classroom Management
 // ---------------------------------------------------------------------------
+async function enterManagedClassroom(room) {
+  if (!room?.id) return UI.toast('Invalid classroom.', 'error');
+
+  try {
+    // Leaving any active lobby first is safe and prevents an old lobby from
+    // continuing to publish presence after the classroom changes.
+    await Lobby.leaveLobby();
+    Classroom.setCurrentClassroom(room);
+    await renderDashboard();
+    UI.toast(`Entered ${room.name}.`);
+  } catch (err) {
+    console.error('Could not enter classroom:', err);
+    UI.toast(err.message || 'Could not enter classroom.', 'error');
+  }
+}
+
+async function deleteManagedClassroom(room) {
+  if (!room?.id) return UI.toast('Invalid classroom.', 'error');
+
+  const me = Auth.getUser();
+  if (!me?.id || room.created_by !== me.id) {
+    UI.toast('Only the classroom creator can delete this classroom.', 'error');
+    return;
+  }
+
+  const confirmed = window.confirm(
+    `Delete "${room.name}" (${room.code})?\n\nAll classroom membership will be removed. Match history will be preserved.`
+  );
+  if (!confirmed) return;
+
+  try {
+    await Lobby.leaveLobby();
+    await Classroom.deleteClassroom(room.id);
+    UI.toast(`Deleted ${room.name}.`);
+    await renderClassroomManagement();
+  } catch (err) {
+    console.error('Could not delete classroom:', err);
+    UI.toast(err.message || 'Could not delete classroom.', 'error');
+  }
+}
+
 async function renderClassroomManagement() {
   UI.showScreen('classroom-management');
 
@@ -243,41 +284,56 @@ async function renderClassroomManagement() {
     }
 
     const current = Classroom.getCurrentClassroom();
+    const me = Auth.getUser();
 
     for (const room of rooms) {
       const isCurrent = current?.id === room.id;
+      const isOwner = room.created_by === me?.id;
+
+      const enterButton = UI.el('button', {
+        class: isCurrent
+          ? 'btn btn--small btn--ghost'
+          : 'btn btn--small btn--primary',
+        type: 'button',
+        text: isCurrent ? 'CURRENT' : 'ENTER',
+        disabled: isCurrent,
+        'aria-label': isCurrent ? `${room.name} is current` : `Enter ${room.name}`,
+        onclick: () => enterManagedClassroom(room),
+      });
+
+      const actions = [enterButton];
+
+      // Only the creator gets DELETE. Members who merely joined the classroom
+      // never see or receive a delete action.
+      if (isOwner) {
+        actions.push(
+          UI.el('button', {
+            class: 'btn btn--small btn--danger',
+            type: 'button',
+            text: 'DELETE',
+            'aria-label': `Delete ${room.name}`,
+            onclick: () => deleteManagedClassroom(room),
+          })
+        );
+      }
 
       const card = UI.el('div', { class: 'management-classroom-card' }, [
         UI.el('div', { class: 'management-classroom-card__info' }, [
           UI.el('strong', { text: room.name }),
           UI.el('span', { text: `Code: ${room.code}` }),
+          isOwner ? UI.el('span', { class: 'management-owner-badge', text: 'CREATOR' }) : null,
         ]),
-        UI.el('button', {
-          class: isCurrent
-            ? 'btn btn--small btn--ghost'
-            : 'btn btn--small btn--primary',
-          type: 'button',
-          text: isCurrent ? 'CURRENT' : 'ENTER',
-          disabled: isCurrent,
-          onclick: async () => {
-            try {
-              await Lobby.leaveLobby();
-              Classroom.setCurrentClassroom(room);
-              await renderDashboard();
-            } catch (err) {
-              UI.toast(err.message, 'error');
-            }
-          },
-        }),
+        UI.el('div', { class: 'management-classroom-card__actions' }, actions),
       ]);
 
       list.appendChild(card);
     }
   } catch (err) {
+    console.error('Could not load classrooms:', err);
     list.innerHTML = '';
     list.appendChild(UI.el('p', {
       class: 'muted',
-      text: err.message,
+      text: err.message || 'Could not load classrooms.',
     }));
   }
 }

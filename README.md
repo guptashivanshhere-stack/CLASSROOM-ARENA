@@ -164,5 +164,17 @@ is exactly what was verified above.
   `match_history_opponent_id_fkey` constraint name that Postgres generates
   by default from `sql/schema.sql`. If you rename that column/constraint,
   update the join hint in `js/profile.js` to match.
-#   C L A S S R O O M - A R E N A  
- 
+
+## Classroom Management Fix
+
+The classroom management screen now:
+- shows each classroom only once in the UI, including protection against legacy duplicate classroom codes;
+- makes ENTER switch the active classroom reliably;
+- shows DELETE only to the user whose `created_by` matches their authenticated user ID;
+- keeps the classroom creator badge visible;
+- deletes classroom membership via the guarded `delete_classroom` RPC while preserving match history by detaching its classroom reference;
+- blocks creation of a new classroom when its code already exists, including databases that contain legacy duplicate codes.
+
+### Supabase SQL
+
+Run the current `sql/schema.sql` in the Supabase SQL Editor once after updating the project. The `delete_classroom(uuid)` RPC is restricted to authenticated users and still verifies ownership inside the database.
